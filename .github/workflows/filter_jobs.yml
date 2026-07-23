@@ -1,0 +1,40 @@
+name: Filter Canadian jobs
+
+# hourly timing comes from cron-job.org, which POSTs to this workflow's /dispatches endpoint. 
+on:
+  workflow_dispatch:
+
+# the job commits last_seen_id.json back, so it needs write access
+permissions:
+  contents: write
+
+# never let two runs overlap, they would fight over the push
+concurrency:
+  group: filter-jobs
+  cancel-in-progress: false
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run the filter
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+        run: python filter_jobs.py
+
+      - name: Commit the updated marker
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add last_seen_id.json
+          git diff --staged --quiet || git commit -m "Update last_seen_id"
+          git push
