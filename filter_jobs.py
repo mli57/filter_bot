@@ -10,7 +10,9 @@ SPEEDY_CHANNEL_ID = "1529666742400323674" # id of speedyapply channel
 SPEEDY_ID = "1528605281167085666"
 CANADA_CHANNEL_ID = "1529658963455508541"
 
-CANADA_KEYWORDS = ["canada", "toronto", "vancouver", "montreal", "ottawa", "calgary", "edmonton", "winnipeg"]
+CANADA_KEYWORDS = ["canada", "toronto", "vancouver", "montreal", "ottawa", "calgary", "edmonton", "winnipeg",
+                   "mississauga", "brampton", "markham", "vaughan", "richmond hill", "oakville",
+                   "burlington", "oshawa", "pickering", "waterloo", "kitchener", "hamilton"]
 
 
 ## Helper funcs
