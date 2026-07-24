@@ -7,7 +7,9 @@ load_dotenv("token.env") # no-op in CI, where BOT_TOKEN comes from the repo secr
 BOT_TOKEN = os.environ["BOT_TOKEN"]
 
 SPEEDY_CHANNEL_ID = "1529666742400323674" # id of speedyapply channel
-SPEEDY_ID = "1528605281167085666"
+# speedyapply posts through several webhooks (one per job category), each with its own author id
+# but the same username, so match on the name instead of pinning a single id
+SPEEDY_NAME = "speedyapply.com"
 CANADA_CHANNEL_ID = "1529658963455508541"
 
 CANADA_KEYWORDS = ["canada", "toronto", "vancouver", "montreal", "ottawa", "calgary", "edmonton", "winnipeg",
@@ -28,6 +30,11 @@ def get_field_value(fields, name):
         if field["name"] == name:
             return field["value"]
     return None
+
+# A job post is any message from one of speedyapply's feed webhooks
+def is_speedy_post(message):
+    author = message["author"]
+    return author.get("bot") and author.get("username") == SPEEDY_NAME
 
 # Check if each location is canadian by comparing it to a list of keywords
 def is_canada(location):
@@ -72,7 +79,7 @@ def filter_recent_posts(messages, last_seen_id):
 def filter_canada_posts(messages):
     canada_jobs = []
     for message in messages:
-        if message["author"]["id"] == SPEEDY_ID:
+        if is_speedy_post(message):
             fields = get_fields(message)
             if fields is None: # not a job post, skip it rather than crashing the run
                 continue
